@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 generate_headers.py — Convert PocketCosmos JSON assets into C++ byte-array headers.
 
@@ -265,7 +265,7 @@ def main():
             f.write(f"namespace {namespace_name} {{\n\n")
 
             count = 0
-            valid_entries = []
+            valid_entries = {}
             for entry in entries:
                 uuid = entry.get("uuid", "")
                 response_path = entry.get("response", "")
@@ -284,12 +284,12 @@ def main():
                 with open(full_path, "r", encoding="utf-8") as rf:
                     content = rf.read()
 
-                valid_entries.append((uuid, content))
+                valid_entries[uuid] = content
                 count += 1
 
             # Write as a map of string_view -> string_view
             f.write(f"inline const std::unordered_map<std::string, std::string_view> {map_name} = {{\n")
-            for uuid, content in valid_entries:
+            for uuid, content in valid_entries.items():
                 # Escape the content for C++ string literal
                 escaped = content.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
                 # Use raw byte arrays instead for large content
@@ -310,7 +310,7 @@ def main():
             f.write("#include <unordered_map>\n\n")
             f.write(f"namespace {namespace_name} {{\n\n")
 
-            for uuid, content in valid_entries:
+            for uuid, content in valid_entries.items():
                 var_name = f"kPF_{sanitize_var_name(uuid.replace('-','_'))}"
                 data = content.encode("utf-8")
                 hex_body = bytes_to_hex_array(data)
@@ -318,7 +318,7 @@ def main():
                 f.write(f"static constexpr std::size_t {var_name}_size = {len(data)};\n\n")
 
             f.write(f"inline const std::unordered_map<std::string, std::string_view> {map_name} = {{\n")
-            for uuid, content in valid_entries:
+            for uuid, content in valid_entries.items():
                 var_name = f"kPF_{sanitize_var_name(uuid.replace('-','_'))}"
                 f.write(f'    {{"{uuid}", std::string_view(reinterpret_cast<const char*>({var_name}), {var_name}_size)}},\n')
             f.write("};\n\n")
@@ -445,3 +445,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
