@@ -1,0 +1,18 @@
+# Build output
+build/
+generated/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled
+*.o
+*.so
+*.a

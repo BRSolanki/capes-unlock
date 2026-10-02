@@ -1,0 +1,90 @@
+name: Build libcapes.so (Full PocketCosmos Capes)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a, x86_64, x86]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+
+      - name: Generate C++ headers from PocketCosmos assets
+        run: |
+          python generate_headers.py \
+            --cosmos-assets assets/cosmos \
+            --legal-assets assets/legal \
+            --legal-src assets/legal_src \
+            --output-dir generated
+
+      - name: Configure CMake
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI="${{ matrix.abi }}" \
+            -DANDROID_PLATFORM=android-24 \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build libcapes.so
+        run: cmake --build build --config Release -j$(nproc)
+
+      - name: Verify output
+        run: |
+          ls -la build/libcapes.so
+          file build/libcapes.so
+
+      - name: Upload libcapes.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libcapes-${{ matrix.abi }}
+          path: build/libcapes.so
+          retention-days: 90
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all ABI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package all ABIs
+        run: |
+          mkdir -p release/lib
+          for abi in arm64-v8a armeabi-v7a x86_64 x86; do
+            mkdir -p "release/lib/$abi"
+            cp "artifacts/libcapes-$abi/libcapes.so" "release/lib/$abi/"
+          done
+          cd release && zip -r ../libcapes-full-all-abis.zip lib/
+
+      - name: Upload combined package
+        uses: actions/upload-artifact@v4
+        with:
+          name: libcapes-full-all-abis
+          path: libcapes-full-all-abis.zip
+          retention-days: 90

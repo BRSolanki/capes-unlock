@@ -1,3 +1,0 @@
-Legal Capes variant
-
-Serves the Cosmos cape catalogue with the first 22 official/earned cape entries removed. Remaining cape entries: 238.
