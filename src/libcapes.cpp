@@ -1,4 +1,4 @@
-#include <jni.h>
+﻿#include <jni.h>
 #include <android/log.h>
 #include <dlfcn.h>
 
@@ -1012,6 +1012,8 @@ bool install(JNIEnv* env) {
     };
     const MainPage mainPages[] = {
         {"/api/v2.0/layout/pages/DressingRoom_Capes", kPage_Capes, kPage_Capes_size},
+        {"/api/v2.0/layout/pages/DressingRoom_Capes_v1", kPage_Capes, kPage_Capes_size},
+        {"/api/v2.0/layout/pages/DressingRoom_Capes_v2", kPage_Capes, kPage_Capes_size},
         {"/api/v2.0/layout/pages/MultiItemPage_BedrockCosmosMarketplaceCategoryPage", kPage_MainMarketplacePage, kPage_MainMarketplacePage_size},
         {"/api/v2.0/layout/pages/MultiItemPage_LegacyVault", kPage_LegacyVault, kPage_LegacyVault_size},
         {"/api/v2.0/layout/pages/MultiItemPage_MinecraftRestored", kPage_MinecraftRestored, kPage_MinecraftRestored_size},
@@ -1197,3 +1199,4 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void*) {
     LOGI("[mchook] JNI_OnLoad scheduled delayed installation");
     return JNI_VERSION_1_6;
 }
+
