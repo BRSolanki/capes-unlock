@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "headline": "LeviLauncher Improvements",
+  "summary": "This update improves touch handling and native mod menu integration.",
+  "sections": [
+    {
+      "title": "Features",
+      "items": [
+        {
+          "text": "Added functions for native mods to open and close the launcher mod menu.",
+          "url": "https://github.com/LiteLDev/LeviLaunchroid/commit/2df2f1fb6f341fa6f0d11485d3c5f234f52c98b2"
+        }
+      ]
+    },
+    {
+      "title": "Improvements",
+      "items": [
+        {
+          "text": "Improved touch event handling",
+          "url": "https://github.com/LiteLDev/LeviLaunchroid/commit/1372b49fdb3ff3ef4742565051a4fd724da6e60b"
+        }
+      ]
+    }
+  ]
+}
